@@ -34,6 +34,9 @@ io.on("connection", (socket) => {
 
             console.log(`${username} joined room: ${roomName}`);
 
+            // Send username back to the joining client
+            socket.emit('user assigned', username);
+
             // Notify others in the room
             socket.to(roomName).emit("message", {
                 user: "System",
@@ -55,17 +58,24 @@ io.on("connection", (socket) => {
 
 
     socket.on("chat message", (msg) => {
+        if (!msg.text || typeof msg.text !== 'string') {
+            return socket.emit("message", {
+                user: "System",
+                text: "Error: Invalid message format. Please send a valid message.",
+            });
+        }
+    
         // Only broadcast to the sender's room
         if (socket.room) {
-             io.to(socket.room).emit("message", { user: socket.username, text: msg });
+            io.to(socket.room).emit("message", { user: socket.username, text: msg.text });
         } else {
-             // Handle case where user tries to send message before joining a room
-             socket.emit("message", {
+            socket.emit("message", {
                 user: "System",
                 text: `Please join a room first.`,
             });
         }
     });
+    
 
     socket.on("disconnect", () => {
         console.log('user disconnected');
