@@ -79,6 +79,8 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(5000, () => {
-    console.log("Server running at http://localhost:5000");
-});
+// server.listen(5000, () => {  // <--- Remove or comment out this block
+//     console.log("Server running at http://localhost:5000");
+// });
+
+module.exports = app; // <--- Export the Express app
